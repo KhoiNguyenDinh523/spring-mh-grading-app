@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Admin Dashboard')}"></head>
+
+<body>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <main class="container">
+        <div class="page-header">
+            <h1>🛡️ Admin Dashboard</h1>
+            <div class="btn-group">
+                <a th:href="@{/admin/assignments/new}" class="btn btn-primary">+ New Assignment Task</a>
+                <a th:href="@{/admin/users/new}" class="btn btn-outline">+ Add New User Account</a>
+            </div>
+        </div>
+
+        <div th:replace="~{fragments/layout :: alerts}"></div>
+
+        <!-- Stats Row -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" th:text="${assignments.size()}">0</div>
+                <div class="stat-label">Total Assignments</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" th:text="${ongoingCount}">0</div>
+                <div class="stat-label">Ongoing</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" th:text="${expiredCount}">0</div>
+                <div class="stat-label">Expired</div>
+            </div>
+        </div>
+
+        <!-- Quick Nav -->
+        <div class="admin-nav-cards">
+            <a th:href="@{/admin/users}" class="nav-card">
+                <span class="nav-card-icon">👥</span>
+                <span>Manage Users & Roles</span>
+            </a>
+        </div>
+
+        <!-- Assignments Table -->
+        <h2 style="margin-top: 2rem;">Assignment Tasks (Problems)</h2>
+        <div th:if="${assignments.empty}" class="empty-state">
+            <p>No assignments created yet.</p>
+        </div>
+        <table th:unless="${assignments.empty}" class="table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Status</th>
+                    <th>Deadline</th>
+                    <th>Solutions</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="a : ${assignments}">
+                    <td>
+                        <strong th:text="${a.title}">Title</strong>
+                    </td>
+                    <td>
+                        <span th:class="'badge status-' + ${a.status.name().toLowerCase()}"
+                            th:text="${a.status}">ONGOING</span>
+                    </td>
+                    <td th:text="${#temporals.format(a.deadline, 'dd/MM/yyyy HH:mm')}">Date</td>
+                    <td>
+                        <a th:href="@{/admin/assignments/{id}(id=${a.id})}" class="btn btn-sm btn-outline">
+                            View Solutions (<span th:text="${a.solutions.size()}">0</span>)
+                        </a>
+                    </td>
+                    <td>
+                        <div class="btn-group">
+                            <a th:href="@{/admin/assignments/{id}/edit(id=${a.id})}"
+                                class="btn btn-sm btn-primary">Edit</a>
+                            <form th:action="@{/admin/assignments/{id}/delete(id=${a.id})}" method="post"
+                                onsubmit="return confirm('Delete task and all solutions?')">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </main>
+</body>
+
+</html>

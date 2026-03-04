@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Task Grade View: ' + ${assignment.title})}"></head>
+
+<body>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <main class="container">
+        <div class="page-header">
+            <div>
+                <a th:href="@{/grader/dashboard}" style="color: var(--primary); text-decoration: none;">← Back to
+                    Dash</a>
+                <h1 th:text="${assignment.title}">Title</h1>
+                <p style="color: var(--gray);"
+                    th:text="'Deadline: ' + ${#temporals.format(assignment.deadline, 'dd/MM/yyyy HH:mm')}"></p>
+            </div>
+        </div>
+
+        <section class="assignment-desc"
+            style="background: #fff; padding: 1.5rem; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 2rem;">
+            <h3>Task Details</h3>
+            <div style="white-space: pre-wrap;" th:text="${assignment.description}">Description</div>
+        </section>
+
+        <h2>Solutions Assigned to Me for this Task</h2>
+        <div th:if="${assignedSolutions.empty}" class="empty-state">
+            <p>You haven't been assigned any solutions for this specific task.</p>
+        </div>
+
+        <table th:unless="${assignedSolutions.empty}" class="table">
+            <thead>
+                <tr>
+                    <th>Applicant</th>
+                    <th>Submitted</th>
+                    <th>Score</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="s : ${assignedSolutions}">
+                    <td th:text="${s.uploader.username}">User</td>
+                    <td th:text="${#temporals.format(s.submittedAt, 'dd/MM/yyyy HH:mm')}">Time</td>
+                    <td>
+                        <span th:if="${s.score != null}" class="score-badge" th:text="${s.score} + '/10'">-</span>
+                        <span th:unless="${s.score != null}" class="badge status-pending">Pending</span>
+                    </td>
+                    <td>
+                        <div class="btn-group">
+                            <a th:href="@{/grader/download/{id}(id=${s.id})}"
+                                class="btn btn-sm btn-outline">Download</a>
+                            <a th:href="@{/grader/grade/{id}(id=${s.id})}" class="btn btn-sm btn-primary">Grade</a>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </main>
+</body>
+
+</html>

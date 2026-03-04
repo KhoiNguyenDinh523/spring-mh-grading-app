@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('My Dashboard')}"></head>
+
+<body>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <main class="container">
+        <div class="page-header">
+            <h1>✍️ Applicant Dashboard</h1>
+        </div>
+
+        <div th:replace="~{fragments/layout :: alerts}"></div>
+
+        <h2>Ongoing Assignments</h2>
+        <p style="color: var(--gray); margin-bottom: 2rem;">Choose an assignment to view details and submit your
+            solution.</p>
+
+        <div th:if="${activeAssignments.empty}" class="empty-state">
+            <p>No ongoing assignments at the moment. Check back later!</p>
+        </div>
+
+        <div class="grid"
+            style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;">
+            <div th:each="a : ${activeAssignments}" class="card" style="display: flex; flex-direction: column;">
+                <h3 th:text="${a.title}">Title</h3>
+                <p style="color: var(--gray); font-size: 0.85rem; margin-bottom: 1rem;">
+                    ⏰ Deadline: <span th:text="${#temporals.format(a.deadline, 'dd/MM/yyyy HH:mm')}">Time</span>
+                </p>
+                <div style="flex-grow: 1; margin-bottom: 1.5rem;">
+                    <p th:text="${#strings.abbreviate(a.description, 100)}">Short desc...</p>
+                </div>
+                <a th:href="@{/applicant/assignments/{id}(id=${a.id})}" class="btn btn-primary">View Details &
+                    Submit</a>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>

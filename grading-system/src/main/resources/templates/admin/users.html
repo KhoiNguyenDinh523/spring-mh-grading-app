@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Manage Users')}"></head>
+
+<body>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <main class="container">
+        <div class="page-header">
+            <h1>👥 User Management</h1>
+            <a th:href="@{/admin/users/new}" class="btn btn-primary">+ Create New User</a>
+        </div>
+
+        <div th:replace="~{fragments/layout :: alerts}"></div>
+
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="u : ${users}">
+                        <td th:text="${u.username}">Username</td>
+                        <td th:text="${u.email}">Email</td>
+                        <td>
+                            <span class="badge"
+                                th:classappend="${u.role.name() == 'ROLE_ADMIN' ? 'status-expired' : 'status-ongoing'}"
+                                th:text="${u.role.name().replace('ROLE_', '')}">ROLE</span>
+                        </td>
+                        <td>
+                            <span th:if="${u.enabled}" class="status-indicator status-ongoing"></span>
+                            <span th:unless="${u.enabled}" class="status-indicator status-pending"></span>
+                            <span th:text="${u.enabled ? 'Enabled' : 'Disabled'}">Status</span>
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <!-- Edit: Allowed for all, but service protects other admins -->
+                                <a th:href="@{/admin/users/{id}/edit(id=${u.id})}"
+                                    class="btn btn-sm btn-outline">Edit</a>
+
+                                <!-- Restrictions: Cannot disable/delete self or other admins -->
+                                <th:block th:if="${u.role.name() != 'ROLE_ADMIN'}">
+                                    <form th:action="@{/admin/users/{id}/toggle(id=${u.id})}" method="post"
+                                        style="display:inline">
+                                        <input type="hidden" name="enabled" th:value="${!u.enabled}" />
+                                        <button type="submit"
+                                            th:class="${u.enabled ? 'btn btn-sm btn-outline' : 'btn btn-sm btn-primary'}"
+                                            th:text="${u.enabled ? 'Disable' : 'Enable'}">Toggle</button>
+                                    </form>
+
+                                    <form th:action="@{/admin/users/{id}/delete(id=${u.id})}" method="post"
+                                        onsubmit="return confirm('Permanently delete this user?')"
+                                        style="display:inline">
+                                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                    </form>
+                                </th:block>
+                                <th:block th:if="${u.role.name() == 'ROLE_ADMIN'}">
+                                    <span style="font-size: 0.8rem; color: var(--gray); font-style: italic;">Admin
+                                        Protected</span>
+                                </th:block>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</body>
+
+</html>

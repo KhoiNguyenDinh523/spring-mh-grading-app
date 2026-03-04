@@ -1,0 +1,18 @@
+# Project Root
+.idea/
+.vscode/
+*.log
+Thumbs.db
+.DS_Store
+
+# Java Project
+grading-system/target/
+grading-system/.mvn/
+grading-system/mvnw
+grading-system/mvnw.cmd
+grading-system/src/main/resources/application.properties
+
+# Uploads
+uploads/
+/uploads/
+C:/uploads/
